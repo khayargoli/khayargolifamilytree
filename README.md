@@ -78,5 +78,18 @@ click-through, and search/jump controls. Parent-child and spouse edges remain
 distinct, including multiple spouse relationships. Each branch also includes
 a keyboard-friendly linked-list alternative.
 
+## Phase 4 authentication
+
+Auth.js uses Google OAuth with database-backed sessions. New Google accounts
+start as pending members. Administrators can review and approve membership at
+`/admin/members`. Set `BOOTSTRAP_ADMIN_EMAILS` to a comma-separated list of
+trusted Google email addresses before their first sign-in; those accounts are
+promoted to approved admins. Role and membership checks are enforced on the
+server.
+
+Before testing authentication, set `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, and
+`GOOGLE_CLIENT_SECRET` in `.env`, configure the Google callback URL as
+`http://localhost:3000/api/auth/callback/google`, and run the migrations.
+
 The authoritative implementation plan is
-`docs/khayargoli-family-tree-plan.md`. Phase 4 is the next phase.
+`docs/khayargoli-family-tree-plan.md`. Phase 5 is the next phase.

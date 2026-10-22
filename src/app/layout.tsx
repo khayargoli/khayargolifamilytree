@@ -47,6 +47,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link className="hover:text-stone-950" href="/privacy">
                 Privacy
               </Link>
+              <Link className="font-medium text-stone-900" href="/login">
+                Sign in
+              </Link>
             </div>
           </nav>
         </header>

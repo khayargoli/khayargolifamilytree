@@ -12,6 +12,10 @@ describe("environment configuration", () => {
     ).toEqual({
       DATABASE_URL: "postgresql://localhost/family-tree",
       NODE_ENV: "test",
+      AUTH_SECRET: undefined,
+      GOOGLE_CLIENT_ID: undefined,
+      GOOGLE_CLIENT_SECRET: undefined,
+      BOOTSTRAP_ADMIN_EMAILS: "",
     });
   });
 
