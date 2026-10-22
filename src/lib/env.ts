@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required").optional(),
   GOOGLE_CLIENT_ID: z.string().min(1).optional(),
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
@@ -17,6 +18,7 @@ export const envSchema = z.object({
 export const parseEnv = (input: NodeJS.ProcessEnv) =>
   envSchema.parse({
     DATABASE_URL: input.DATABASE_URL,
+    NEXT_PUBLIC_SITE_URL: input.NEXT_PUBLIC_SITE_URL,
     AUTH_SECRET: input.AUTH_SECRET,
     GOOGLE_CLIENT_ID: input.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: input.GOOGLE_CLIENT_SECRET,
