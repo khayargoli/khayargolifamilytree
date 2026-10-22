@@ -47,6 +47,51 @@ async function AdminContent() {
         </Link>
         <Link
           className="rounded-2xl border border-stone-200 bg-white p-6 hover:border-stone-400"
+          href="/admin/claims"
+        >
+          <h2 className="font-semibold text-stone-950">Profile claims</h2>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Verify which person record an approved member may manage.
+          </p>
+        </Link>
+        <Link
+          className="rounded-2xl border border-stone-200 bg-white p-6 hover:border-stone-400"
+          href="/admin/changes"
+        >
+          <h2 className="font-semibold text-stone-950">Change review</h2>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Review and publish proposed people and relationship changes.
+          </p>
+        </Link>
+        <Link
+          className="rounded-2xl border border-stone-200 bg-white p-6 hover:border-stone-400"
+          href="/admin/media"
+        >
+          <h2 className="font-semibold text-stone-950">Photos and stories</h2>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Review submitted family history and media before publication.
+          </p>
+        </Link>
+        <Link
+          className="rounded-2xl border border-stone-200 bg-white p-6 hover:border-stone-400"
+          href="/admin/people"
+        >
+          <h2 className="font-semibold text-stone-950">People</h2>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Create, edit, and archive canonical person records.
+          </p>
+        </Link>
+        <Link
+          className="rounded-2xl border border-stone-200 bg-white p-6 hover:border-stone-400"
+          href="/admin/relationships"
+        >
+          <h2 className="font-semibold text-stone-950">Relationships</h2>
+          <p className="mt-2 text-sm leading-6 text-stone-600">
+            Connect parents, children, and multiple spouse relationships.
+          </p>
+        </Link>
+        <Link
+          className="rounded-2xl border border-stone-200 bg-white p-6 hover:border-stone-400"
           href="/people"
         >
           <h2 className="font-semibold text-stone-950">Public directory</h2>
