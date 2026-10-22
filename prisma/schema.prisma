@@ -6,4 +6,181 @@ datasource db {
   provider = "postgresql"
 }
 
-// Domain models are introduced in Phase 1.
+enum UserRole {
+  ADMIN
+  MEMBER
+}
+
+enum MembershipStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PersonVisibility {
+  PUBLIC
+  RESTRICTED
+}
+
+enum RelationshipType {
+  PARENT_CHILD
+  SPOUSE
+}
+
+enum RelationshipStatus {
+  PUBLISHED
+  PENDING
+  REJECTED
+}
+
+enum MarriageEndReason {
+  DEATH
+  DIVORCE
+  SEPARATION
+  OTHER
+}
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ChangeType {
+  CREATE_PERSON
+  UPDATE_PERSON
+  CREATE_RELATIONSHIP
+  UPDATE_RELATIONSHIP
+}
+
+enum ChangeRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id                       String             @id @default(cuid())
+  name                     String?
+  email                    String?            @unique
+  image                    String?
+  role                     UserRole           @default(MEMBER)
+  membershipStatus         MembershipStatus   @default(PENDING)
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
+  createdPeople             Person[]           @relation("PersonCreatedBy")
+  createdRelationships      Relationship[]     @relation("RelationshipCreatedBy")
+  reviewedRelationships     Relationship[]     @relation("RelationshipReviewedBy")
+  personAccounts            PersonAccount[]
+  submittedChangeRequests  ChangeRequest[]    @relation("ChangeSubmittedBy")
+  reviewedChangeRequests   ChangeRequest[]    @relation("ChangeReviewedBy")
+  auditLogs                 AuditLog[]         @relation("AuditActor")
+}
+
+model Person {
+  id                 String          @id @default(cuid())
+  primaryName        String
+  biography          String?
+  occupation         String?
+  birthDate          DateTime?
+  deathDate          DateTime?
+  birthPlace         String?
+  profileImageKey     String?
+  isLiving           Boolean?
+  visibility         PersonVisibility @default(RESTRICTED)
+  archivedAt         DateTime?
+  createdByUserId    String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  createdBy          User?           @relation("PersonCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  names              PersonName[]
+  relationshipsAsA   Relationship[]  @relation("RelationshipPersonA")
+  relationshipsAsB   Relationship[]  @relation("RelationshipPersonB")
+  accounts            PersonAccount[]
+  changeRequests     ChangeRequest[]
+
+  @@index([primaryName])
+  @@index([visibility])
+}
+
+model PersonName {
+  id        String   @id @default(cuid())
+  personId  String
+  name      String
+  createdAt DateTime @default(now())
+  person    Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, name])
+  @@index([name])
+}
+
+model Relationship {
+  id                String             @id @default(cuid())
+  type              RelationshipType
+  personAId         String
+  personBId         String
+  status            RelationshipStatus @default(PUBLISHED)
+  marriageStartDate DateTime?
+  marriageEndDate   DateTime?
+  marriageEndReason MarriageEndReason?
+  createdByUserId   String?
+  reviewedByUserId  String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  personA           Person             @relation("RelationshipPersonA", fields: [personAId], references: [id], onDelete: Cascade)
+  personB           Person             @relation("RelationshipPersonB", fields: [personBId], references: [id], onDelete: Cascade)
+  createdBy         User?              @relation("RelationshipCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  reviewedBy        User?              @relation("RelationshipReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([type, personAId, personBId])
+  @@index([personAId, type])
+  @@index([personBId, type])
+  @@index([status])
+}
+
+model PersonAccount {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  personId  String
+  status    ClaimStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  person    Person      @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId, status])
+}
+
+model ChangeRequest {
+  id                String              @id @default(cuid())
+  submittedByUserId String
+  personId          String?
+  changeType        ChangeType
+  proposedData      Json
+  status            ChangeRequestStatus @default(PENDING)
+  reviewedByUserId  String?
+  reviewNote        String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  submittedBy       User                @relation("ChangeSubmittedBy", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+  person            Person?             @relation(fields: [personId], references: [id], onDelete: SetNull)
+  reviewedBy        User?               @relation("ChangeReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([submittedByUserId])
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorUserId   String?
+  action        String
+  entityType    String
+  entityId      String
+  beforeSummary Json?
+  afterSummary  Json?
+  createdAt     DateTime @default(now())
+  actor         User?    @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorUserId, createdAt])
+}

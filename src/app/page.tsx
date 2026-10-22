@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-6 py-16 sm:px-10">
@@ -13,18 +15,18 @@ export default function Home() {
           stories that connect generations.
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <a
+          <Link
             className="rounded-full bg-stone-900 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-stone-700"
             href="/tree"
           >
             Explore the tree
-          </a>
-          <a
+          </Link>
+          <Link
             className="rounded-full border border-stone-300 px-6 py-3 text-center text-sm font-semibold text-stone-800 transition hover:border-stone-500"
             href="/people"
           >
             Browse people
-          </a>
+          </Link>
         </div>
       </div>
       <section className="mt-20 grid gap-4 border-t border-stone-200 pt-8 text-sm text-stone-600 sm:grid-cols-3">

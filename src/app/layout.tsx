@@ -38,15 +38,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               Khayargoli Family Tree
             </Link>
             <div className="flex gap-5 text-sm text-stone-600">
-              <a className="hover:text-stone-950" href="/tree">
+              <Link className="hover:text-stone-950" href="/tree">
                 Tree
-              </a>
-              <a className="hover:text-stone-950" href="/people">
+              </Link>
+              <Link className="hover:text-stone-950" href="/people">
                 People
-              </a>
-              <a className="hover:text-stone-950" href="/privacy">
+              </Link>
+              <Link className="hover:text-stone-950" href="/privacy">
                 Privacy
-              </a>
+              </Link>
             </div>
           </nav>
         </header>
