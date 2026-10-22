@@ -91,5 +91,23 @@ Before testing authentication, set `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, and
 `GOOGLE_CLIENT_SECRET` in `.env`, configure the Google callback URL as
 `http://localhost:3000/api/auth/callback/google`, and run the migrations.
 
+## Phase 5 contributions and review
+
+Approved members can use `/contribute` to request a profile claim, propose
+their own profile updates, suggest new people, and propose parent-child or
+spouse relationships. Claims are reviewed at `/admin/claims`; other proposals
+are reviewed at `/admin/changes`. Pending proposals remain separate from
+canonical family data until an admin approves them. Approvals apply validated
+changes transactionally and write audit records.
+
+## Phase 6 photos and family history
+
+Cloudinary stores submitted images as authenticated assets under the
+`khayargoli` folder. Uploads are limited to images up to 10 MB and remain
+restricted until an administrator approves them at `/admin/media`. Approved
+stories and signed Cloudinary image URLs are displayed at `/history`.
+Configure `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and
+`CLOUDINARY_API_SECRET` in `.env`; the API secret is server-only.
+
 The authoritative implementation plan is
-`docs/khayargoli-family-tree-plan.md`. Phase 5 is the next phase.
+`docs/khayargoli-family-tree-plan.md`. Phase 7 is the next phase.

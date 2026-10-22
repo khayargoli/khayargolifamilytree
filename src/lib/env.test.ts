@@ -16,6 +16,9 @@ describe("environment configuration", () => {
       GOOGLE_CLIENT_ID: undefined,
       GOOGLE_CLIENT_SECRET: undefined,
       BOOTSTRAP_ADMIN_EMAILS: "",
+      CLOUDINARY_CLOUD_NAME: undefined,
+      CLOUDINARY_API_KEY: undefined,
+      CLOUDINARY_API_SECRET: undefined,
     });
   });
 

@@ -59,6 +59,17 @@ enum ChangeRequestStatus {
   REJECTED
 }
 
+enum MediaStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MediaVisibility {
+  PUBLIC
+  RESTRICTED
+}
+
 model User {
   id                       String             @id @default(cuid())
   name                     String?
@@ -75,6 +86,11 @@ model User {
   createdRelationships      Relationship[]     @relation("RelationshipCreatedBy")
   reviewedRelationships     Relationship[]     @relation("RelationshipReviewedBy")
   personAccounts            PersonAccount[]
+  reviewedClaims            PersonAccount[]    @relation("ClaimReviewedBy")
+  submittedStories          FamilyStory[]      @relation("StorySubmittedBy")
+  reviewedStories           FamilyStory[]      @relation("StoryReviewedBy")
+  uploadedMedia             Media[]            @relation("MediaUploadedBy")
+  reviewedMedia             Media[]            @relation("MediaReviewedBy")
   submittedChangeRequests  ChangeRequest[]    @relation("ChangeSubmittedBy")
   reviewedChangeRequests   ChangeRequest[]    @relation("ChangeReviewedBy")
   auditLogs                 AuditLog[]         @relation("AuditActor")
@@ -138,9 +154,61 @@ model Person {
   relationshipsAsB   Relationship[]  @relation("RelationshipPersonB")
   accounts            PersonAccount[]
   changeRequests     ChangeRequest[]
+  stories            FamilyStory[]
+  media              Media[]
 
   @@index([primaryName])
   @@index([visibility])
+}
+
+model FamilyStory {
+  id                String      @id @default(cuid())
+  title             String
+  body              String
+  personId          String?
+  submittedByUserId String
+  reviewedByUserId  String?
+  status            MediaStatus @default(PENDING)
+  visibility        MediaVisibility @default(RESTRICTED)
+  reviewNote        String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  person            Person?     @relation(fields: [personId], references: [id], onDelete: SetNull)
+  submittedBy       User        @relation("StorySubmittedBy", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+  reviewedBy        User?       @relation("StoryReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+  media             Media[]
+
+  @@index([status, createdAt])
+  @@index([personId])
+}
+
+model Media {
+  id                String          @id @default(cuid())
+  cloudinaryPublicId String         @unique
+  resourceType      String          @default("image")
+  assetType         String          @default("authenticated")
+  format            String?
+  bytes             Int?
+  width             Int?
+  height            Int?
+  caption           String?
+  uploadedByUserId  String
+  reviewedByUserId  String?
+  personId          String?
+  storyId           String?
+  status            MediaStatus     @default(PENDING)
+  visibility        MediaVisibility @default(RESTRICTED)
+  reviewNote        String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  uploadedBy        User            @relation("MediaUploadedBy", fields: [uploadedByUserId], references: [id], onDelete: Restrict)
+  reviewedBy        User?           @relation("MediaReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+  person            Person?         @relation(fields: [personId], references: [id], onDelete: SetNull)
+  story             FamilyStory?    @relation(fields: [storyId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([personId])
+  @@index([storyId])
 }
 
 model PersonName {
@@ -183,12 +251,15 @@ model PersonAccount {
   userId    String      @unique
   personId  String
   status    ClaimStatus @default(PENDING)
+  reviewedByUserId String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   person    Person      @relation(fields: [personId], references: [id], onDelete: Cascade)
+  reviewedBy User?      @relation("ClaimReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
 
   @@index([personId, status])
+  @@index([reviewedByUserId])
 }
 
 model ChangeRequest {
