@@ -28,6 +28,11 @@ const searchInputSchema = z.object({
 });
 
 const pageSize = 20;
+const treePersonSelect = {
+  id: true,
+  primaryName: true,
+  occupation: true,
+} as const;
 
 export type PublicPerson = Awaited<
   ReturnType<typeof getPublicPersonProfile>
@@ -127,4 +132,78 @@ export async function getPublicPersonProfile(personId: string) {
       },
     },
   });
+}
+
+export async function listPublicPeopleForTree() {
+  return getPrisma().person.findMany({
+    where: {
+      visibility: "PUBLIC",
+      archivedAt: null,
+    },
+    select: {
+      ...treePersonSelect,
+      names: {
+        select: { name: true },
+        orderBy: { name: "asc" as const },
+      },
+    },
+    orderBy: { primaryName: "asc" },
+    take: 500,
+  });
+}
+
+export async function getPublicTreeView(rootId?: string) {
+  const prisma = getPrisma();
+  const root = await prisma.person.findFirst({
+    where: {
+      ...(rootId ? { id: rootId } : {}),
+      visibility: "PUBLIC",
+      archivedAt: null,
+    },
+    select: treePersonSelect,
+    orderBy: rootId ? undefined : { primaryName: "asc" },
+  });
+
+  if (!root) return null;
+
+  const relationships = await prisma.relationship.findMany({
+    where: {
+      status: RelationshipStatus.PUBLISHED,
+      OR: [{ personAId: root.id }, { personBId: root.id }],
+      personA: { visibility: "PUBLIC", archivedAt: null },
+      personB: { visibility: "PUBLIC", archivedAt: null },
+    },
+    select: {
+      id: true,
+      type: true,
+      personAId: true,
+      personBId: true,
+      marriageStartDate: true,
+      marriageEndDate: true,
+      marriageEndReason: true,
+      personA: { select: treePersonSelect },
+      personB: { select: treePersonSelect },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const people = new Map([[root.id, root]]);
+  for (const relationship of relationships) {
+    people.set(relationship.personA.id, relationship.personA);
+    people.set(relationship.personB.id, relationship.personB);
+  }
+
+  return {
+    rootId: root.id,
+    people: [...people.values()],
+    relationships: relationships.map((relationship) => ({
+      id: relationship.id,
+      type: relationship.type,
+      personAId: relationship.personAId,
+      personBId: relationship.personBId,
+      marriageStartDate: relationship.marriageStartDate?.toISOString() ?? null,
+      marriageEndDate: relationship.marriageEndDate?.toISOString() ?? null,
+      marriageEndReason: relationship.marriageEndReason,
+    })),
+  };
 }

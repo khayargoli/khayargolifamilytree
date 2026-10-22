@@ -72,7 +72,11 @@ The public directory is available at `/people`, with server-side search,
 pagination, and stable `/people/[id]` profile URLs. Public profile queries use
 an explicit field allowlist and include only published relationships to other
 public, active people. `/privacy` explains the visibility boundary. The
-interactive visualization route at `/tree` remains a Phase 3 placeholder.
+interactive visualization route at `/tree` uses `@xyflow/react` for a focused,
+one-generation view with pan, zoom, fit-to-view, minimap, profile
+click-through, and search/jump controls. Parent-child and spouse edges remain
+distinct, including multiple spouse relationships. Each branch also includes
+a keyboard-friendly linked-list alternative.
 
 The authoritative implementation plan is
-`docs/khayargoli-family-tree-plan.md`. Phase 3 is the next phase.
+`docs/khayargoli-family-tree-plan.md`. Phase 4 is the next phase.
